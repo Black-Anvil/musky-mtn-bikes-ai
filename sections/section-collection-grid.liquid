@@ -1,0 +1,144 @@
+{{ 'section-collection-grid.css' | asset_url | stylesheet_tag }}
+{{ 'component-price.css' | asset_url | stylesheet_tag }}
+
+
+{%- style -%}
+  .collection-grid-section-{{ section.id }} {
+    --accent-color: {{ section.settings.accent_color }};
+  }
+
+  .section-{{ section.id }}-padding {
+    padding-top: {{ section.settings.padding_top | times: 0.75 | round: 0 }}px;
+    padding-bottom: {{ section.settings.padding_bottom | times: 0.75 | round: 0 }}px;
+  }
+
+  @media screen and (min-width: 750px) {
+    .section-{{ section.id }}-padding {
+      padding-top: {{ section.settings.padding_top }}px;
+      padding-bottom: {{ section.settings.padding_bottom }}px;
+    }
+  }
+{%- endstyle -%}
+
+{%- liquid
+  assign grid_collection = section.settings.collection | default: collection
+-%}
+
+{%- comment -%} SVG clipPath definition — rendered once, referenced by all cards via CSS {%- endcomment -%}
+<svg width="0" height="0" aria-hidden="true" style="position: absolute;">
+  <defs>
+    <clipPath id="collection-grid-clip" clipPathUnits="objectBoundingBox">
+      <path d="M 0.03 0 C 0 0, 0 0, 0 0.03 L 0 0.97 C 0 1, 0 1, 0.03 1 L 0.53 1 C 0.55 1, 0.56 0.993, 0.57 0.983 L 0.615 0.938 C 0.625 0.928, 0.635 0.92, 0.645 0.92 L 0.97 0.92 C 1 0.92, 1 0.915, 1 0.89 L 1 0.03 C 1 0, 1 0, 0.97 0 Z" />
+    </clipPath>
+    <clipPath id="collection-grid-clip-mobile" clipPathUnits="objectBoundingBox">
+      <path d="M 0.03 0 C 0 0, 0 0, 0 0.03 L 0 0.97 C 0 1, 0 1, 0.03 1 L 0.42 1 C 0.44 1, 0.45 0.99, 0.46 0.98 L 0.51 0.92 C 0.52 0.91, 0.53 0.9, 0.54 0.9 L 0.97 0.9 C 1 0.9, 1 0.895, 1 0.87 L 1 0.03 C 1 0, 1 0, 0.97 0 Z" />
+    </clipPath>
+  </defs>
+</svg>
+
+<div class="collection-grid-section-{{ section.id }} color-{{ section.settings.color_scheme }} gradient">
+  <div class="page-width section-{{ section.id }}-padding">
+    {%- if grid_collection != blank and grid_collection.products.size > 0 -%}
+      {%- paginate grid_collection.products by section.settings.products_per_page -%}
+        <ul class="collection-grid" role="list">
+          {%- for product in grid_collection.products -%}
+            {%- assign lazy_load = true -%}
+            {%- if forloop.index <= 4 -%}
+              {%- assign lazy_load = false -%}
+            {%- endif -%}
+            <li class="collection-grid__item">
+              {% render 'card-collection-grid',
+                card_product: product,
+                section_id: section.id,
+                lazy_load: lazy_load
+              %}
+            </li>
+          {%- endfor -%}
+        </ul>
+
+        {%- if paginate.pages > 1 -%}
+          {% render 'pagination', paginate: paginate %}
+        {%- endif -%}
+      {%- endpaginate -%}
+    {%- elsif grid_collection == blank -%}
+      {%- if request.design_mode -%}
+        <div class="collection-grid__empty">
+          <p>Select a collection in the section settings</p>
+        </div>
+      {%- endif -%}
+    {%- else -%}
+      <div class="collection-grid__empty">
+        <p>No products found</p>
+      </div>
+    {%- endif -%}
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "Collection Grid",
+  "tag": "section",
+  "class": "section",
+  "settings": [
+    {
+      "type": "collection",
+      "id": "collection",
+      "label": "Collection"
+    },
+    {
+      "type": "range",
+      "id": "products_per_page",
+      "min": 4,
+      "max": 24,
+      "step": 4,
+      "default": 8,
+      "label": "Products per page"
+    },
+    {
+      "type": "header",
+      "content": "Colors"
+    },
+    {
+      "type": "color",
+      "id": "accent_color",
+      "label": "Accent color",
+      "default": "#CCFF00"
+    },
+    {
+      "type": "color_scheme",
+      "id": "color_scheme",
+      "label": "Color scheme",
+      "default": "scheme-1"
+    },
+    {
+      "type": "header",
+      "content": "Section padding"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "min": 0,
+      "max": 100,
+      "step": 4,
+      "unit": "px",
+      "label": "Padding top",
+      "default": 36
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "min": 0,
+      "max": 100,
+      "step": 4,
+      "unit": "px",
+      "label": "Padding bottom",
+      "default": 36
+    }
+  ],
+  "presets": [
+    {
+      "name": "Collection Grid"
+    }
+  ]
+}
+{% endschema %}
