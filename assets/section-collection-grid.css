@@ -1,0 +1,187 @@
+/* Collection Grid Section
+ * Custom staggered product grid with concave corner cards and hover effects
+ */
+
+/* Grid layout */
+.collection-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1.5rem;
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+@media screen and (min-width: 990px) {
+  .collection-grid {
+    grid-template-columns: repeat(4, 1fr);
+    gap: 2rem;
+    --stagger-offset: 60px;
+  }
+
+  .collection-grid__item:nth-child(4n+2),
+  .collection-grid__item:nth-child(4n+4) {
+    margin-top: var(--stagger-offset);
+  }
+}
+
+/* Card */
+.collection-grid-card {
+  display: block;
+}
+
+.collection-grid-card__link {
+  display: block;
+  text-decoration: none;
+  color: inherit;
+}
+
+/* Card media wrapper — positioning context for media + border SVG */
+.collection-grid-card__media-wrapper {
+  position: relative;
+  aspect-ratio: 9 / 10;
+}
+
+/* Card media — clipped to the concave corner shape via SVG clipPath */
+.collection-grid-card__media {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  clip-path: url(#collection-grid-clip-mobile);
+}
+
+@media screen and (min-width: 990px) {
+  .collection-grid-card__media {
+    clip-path: url(#collection-grid-clip);
+  }
+}
+
+/* Border outline — SVG path positioned over (but outside) the clipped media */
+.collection-grid-card__border {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 2;
+  pointer-events: none;
+  overflow: visible;
+}
+
+.collection-grid-card__border path {
+  fill: none;
+  stroke: rgba(var(--color-foreground), 0.2);
+  stroke-width: 1;
+  vector-effect: non-scaling-stroke;
+  transition: stroke 0.3s ease;
+}
+
+.collection-grid-card__border--desktop {
+  display: none;
+}
+
+@media screen and (min-width: 990px) {
+  .collection-grid-card__border--mobile {
+    display: none;
+  }
+
+  .collection-grid-card__border--desktop {
+    display: block;
+  }
+}
+
+.collection-grid-card__image {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.collection-grid-card__media-secondary.collection-grid-card__image {
+  object-fit: cover;
+}
+
+.collection-grid-card__media-secondary {
+  position: absolute;
+  top: 0;
+  left: 0;
+  opacity: 0;
+  clip-path: inset(0 0 100% 0 round 0 0 50% 50% / 0 0 3vw 3vw);
+  transition: clip-path 0.6s ease-in-out, opacity 0.25s ease 0.3s;
+}
+
+/* Hover — accent border + reveal wipe (desktop only) */
+@media (hover: hover) {
+  .collection-grid-card:hover .collection-grid-card__border path {
+    stroke: var(--accent-color);
+  }
+
+  .collection-grid-card:hover .collection-grid-card__media-secondary {
+    opacity: 1;
+    clip-path: inset(0 0 -3vw 0 round 0 0 50% 50% / 0 0 3vw 3vw);
+    transition: clip-path 0.6s ease-out, opacity 0.15s ease;
+  }
+}
+
+.collection-grid-card__placeholder {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: rgba(var(--color-foreground), 0.04);
+}
+
+.collection-grid-card__placeholder .placeholder-svg {
+  width: 60%;
+  height: 60%;
+}
+
+/* Card info — bottom-right on mobile, tab notch on desktop */
+.collection-grid-card__info {
+  position: absolute;
+  bottom: 0.25rem;
+  right: 0.5rem;
+  display: flex;
+  align-items: baseline;
+  justify-content: flex-end;
+  gap: 0.4em;
+  max-width: 43%;
+  line-height: 1;
+}
+
+@media screen and (min-width: 990px) {
+  .collection-grid-card__info {
+    right: 0;
+    max-width: 38%;
+  }
+}
+
+.collection-grid-card__title {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  min-width: 0;
+  text-align: right;
+  font-size: 0.85em;
+}
+
+.collection-grid-card__price {
+  display: none;
+  flex-shrink: 0;
+  font-size: 0.85em;
+  color: var(--accent-color);
+}
+
+@media screen and (min-width: 990px) {
+  .collection-grid-card__price {
+    display: inline;
+  }
+}
+
+/* Empty state */
+.collection-grid__empty {
+  text-align: center;
+  padding: 4rem 0;
+}

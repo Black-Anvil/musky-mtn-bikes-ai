@@ -1,0 +1,81 @@
+{% comment %}
+  Renders a product card for the Collection Grid section
+
+  Accepts:
+  - card_product: {Object} Product Liquid object
+  - section_id: {String} The ID of the parent section
+  - lazy_load: {Boolean} Whether to lazy load images. Default: true
+
+  Usage:
+  {% render 'card-collection-grid', card_product: product, section_id: section.id, lazy_load: true %}
+{% endcomment %}
+
+{%- if card_product and card_product != empty -%}
+  <collection-grid-card class="collection-grid-card">
+    <a href="{{ card_product.url }}" class="collection-grid-card__link">
+      <div class="collection-grid-card__media-wrapper">
+        <div class="collection-grid-card__media">
+          {%- if card_product.featured_media -%}
+            <img
+              srcset="
+                {%- if card_product.featured_media.width >= 165 -%}{{ card_product.featured_media | image_url: width: 165 }} 165w,{%- endif -%}
+                {%- if card_product.featured_media.width >= 360 -%}{{ card_product.featured_media | image_url: width: 360 }} 360w,{%- endif -%}
+                {%- if card_product.featured_media.width >= 533 -%}{{ card_product.featured_media | image_url: width: 533 }} 533w,{%- endif -%}
+                {%- if card_product.featured_media.width >= 720 -%}{{ card_product.featured_media | image_url: width: 720 }} 720w,{%- endif -%}
+                {%- if card_product.featured_media.width >= 940 -%}{{ card_product.featured_media | image_url: width: 940 }} 940w,{%- endif -%}
+                {%- if card_product.featured_media.width >= 1066 -%}{{ card_product.featured_media | image_url: width: 1066 }} 1066w,{%- endif -%}
+                {{ card_product.featured_media | image_url }} {{ card_product.featured_media.width }}w
+              "
+              src="{{ card_product.featured_media | image_url: width: 533 }}"
+              sizes="(min-width: 990px) calc((100vw - 10rem) / 4), calc((100vw - 3rem) / 2)"
+              alt="{{ card_product.featured_media.alt | default: card_product.title | escape }}"
+              class="collection-grid-card__image"
+              {% if lazy_load %}loading="lazy"{% endif %}
+              width="{{ card_product.featured_media.width }}"
+              height="{{ card_product.featured_media.height }}"
+            >
+
+            {%- if card_product.media[1] != null -%}
+              <img
+                srcset="
+                  {%- if card_product.media[1].width >= 165 -%}{{ card_product.media[1] | image_url: width: 165 }} 165w,{%- endif -%}
+                  {%- if card_product.media[1].width >= 360 -%}{{ card_product.media[1] | image_url: width: 360 }} 360w,{%- endif -%}
+                  {%- if card_product.media[1].width >= 533 -%}{{ card_product.media[1] | image_url: width: 533 }} 533w,{%- endif -%}
+                  {%- if card_product.media[1].width >= 720 -%}{{ card_product.media[1] | image_url: width: 720 }} 720w,{%- endif -%}
+                  {%- if card_product.media[1].width >= 940 -%}{{ card_product.media[1] | image_url: width: 940 }} 940w,{%- endif -%}
+                  {%- if card_product.media[1].width >= 1066 -%}{{ card_product.media[1] | image_url: width: 1066 }} 1066w,{%- endif -%}
+                  {{ card_product.media[1] | image_url }} {{ card_product.media[1].width }}w
+                "
+                src="{{ card_product.media[1] | image_url: width: 533 }}"
+                sizes="(min-width: 990px) calc((100vw - 10rem) / 4), calc((100vw - 3rem) / 2)"
+                alt="{{ card_product.media[1].alt | default: card_product.title | escape }}"
+                class="collection-grid-card__image collection-grid-card__media-secondary"
+                loading="lazy"
+                width="{{ card_product.media[1].width }}"
+                height="{{ card_product.media[1].height }}"
+              >
+            {%- endif -%}
+          {%- else -%}
+            <div class="collection-grid-card__placeholder">
+              {{ 'product-apparel-2' | placeholder_svg_tag: 'placeholder-svg' }}
+            </div>
+          {%- endif -%}
+        </div>
+
+        <svg class="collection-grid-card__border collection-grid-card__border--mobile" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">
+          <path d="M 3 0 C 0 0, 0 0, 0 3 L 0 97 C 0 100, 0 100, 3 100 L 42 100 C 44 100, 45 99, 46 98 L 51 92 C 52 91, 53 90, 54 90 L 97 90 C 100 90, 100 89.5, 100 87 L 100 3 C 100 0, 100 0, 97 0 Z" />
+        </svg>
+        <svg class="collection-grid-card__border collection-grid-card__border--desktop" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">
+          <path d="M 3 0 C 0 0, 0 0, 0 3 L 0 97 C 0 100, 0 100, 3 100 L 53 100 C 55 100, 56 99.3, 57 98.3 L 61.5 93.8 C 62.5 92.8, 63.5 92, 64.5 92 L 97 92 C 100 92, 100 91.5, 100 89 L 100 3 C 100 0, 100 0, 97 0 Z" />
+        </svg>
+
+        <div class="collection-grid-card__info">
+          <span class="collection-grid-card__title">{{ card_product.title | escape }}</span>
+          {%- assign raw_price = card_product.price | money_without_currency | strip -%}
+          {%- assign raw_price = raw_price | replace: '.00', '' -%}
+          <span class="collection-grid-card__price">${{ raw_price }}</span>
+        </div>
+      </div>
+    </a>
+  </collection-grid-card>
+{%- endif -%}
